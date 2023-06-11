@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <style>
+        .reminder {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+
+    <h1>设备管理平台</h1>
+    <el-button
+            style="position: fixed; right: 20px; top: 20px;"
+            type="primary"
+            @click="dialogFormVisible = true"
+    >
+        <i class="el-icon-plus"></i>
+        <span>添加设备</span>
+    </el-button>
+    <el-table
+            :data="tableData"
+            border
+            style="width: 100%">
+        <el-table-column
+                fixed
+                prop="no"
+                label="编号"
+                width="150">
+        </el-table-column>
+
+        <el-table-column width="150" label="类型" prop="type"></el-table-column>
+        <el-table-column width="150" label="名称" prop="name"></el-table-column>
+        <el-table-column width="150" label="店铺" prop="store"></el-table-column>
+        <el-table-column width="150" label="出厂时间" prop="factory_time"></el-table-column>
+        <el-table-column width="150" label="型号" prop="model"></el-table-column>
+        <el-table-column width="150" label="价格" prop="price"></el-table-column>
+        <el-table-column width="150" label="购买时间" prop="buy_time"></el-table-column>
+        <el-table-column width="150" label="用途" prop="purpose"></el-table-column>
+        <el-table-column width="150" label="安装公司" prop="install_company"></el-table-column>
+        <el-table-column width="150" label="保修期" prop="warranty"></el-table-column>
+        <el-table-column width="150" label="工厂" prop="factory"></el-table-column>
+        <el-table-column width="150" label="安装地点" prop="install_location"></el-table-column>
+        <el-table-column width="150" label="启用时间" prop="start_time"></el-table-column>
+        <el-table-column width="150" label="设备文档" prop="machine_doc"></el-table-column>
+        <el-table-column width="150" label="附属设备" prop="accessory_device"></el-table-column>
+        <el-table-column width="150" label="设备属性" prop="machine_att"></el-table-column>
+        <el-table-column width="150" label="维修记录" prop="repair_record"></el-table-column>
+        <el-table-column width="150" label="负责人" prop="responsible_person"></el-table-column>
+        <el-table-column width="150" label="更新时间" prop="update_time"></el-table-column>
+        <el-table-column
+                fixed="right"
+                label="操作"
+                width="300s">
+            <template slot-scope="scope">
+                <el-button @click="openDialog(scope.row)" type="primary" size="small">生成二维码</el-button>
+                <el-button @click="handleClick(scope.row)" type="warning" size="small">编辑</el-button>
+                <el-popconfirm
+                        title="确定删除？"
+                        @confirm="deleteClick(scope.row.no)"
+                >
+                    <el-button type="error" size="small" slot="reference">删除</el-button>
+                </el-popconfirm>
+            </template>
+        </el-table-column>
+
+
+    </el-table>
+    <!--    <el-pagination-->
+    <!--            background-->
+    <!--            layout="prev, pager, next"-->
+    <!--            :total="1000"-->
+    <!--            @current-change="changePage">-->
+    <!--    </el-pagination>-->
+
+    <el-dialog width="80%" title="设备信息" :visible.sync="dialogFormVisible">
+        <el-form label-position="right" label-width="90px" :inline="true" :model="form" :rules="rules" ref="form">
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="编号" prop="no">
+                        <el-input v-model="form.no"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="项目名称" prop="type">
+                        <el-select filterable v-model="form.type" placeholder="请选择">
+                            <el-option
+                                    v-for="item in types"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="设备名称" prop="name">
+                        <el-input v-model="form.name"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="购自商店" prop="store">
+                        <el-input v-model="form.store"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="出厂时间" prop="factory_time">
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="form.factory_time" type="date"
+                                        placeholder="选择日期"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="型号" prop="model">
+                        <el-input v-model="form.model"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="价格" prop="price">
+                        <el-input v-model="form.price"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="购买时间" prop="buy_time">
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="form.buy_time" type="date"
+                                        placeholder="选择日期"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="主要用途" prop="purpose">
+                        <el-input v-model="form.purpose"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+
+                    <el-form-item label="安装单位" prop="install_company">
+                        <el-input v-model="form.install_company"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="保修期限" prop="warranty">
+                        <el-input v-model="form.warranty"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="生产厂家" prop="factory">
+                        <el-input v-model="form.factory"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="安装地点" prop="install_location">
+                        <el-input v-model="form.install_location"/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="启用时间" prop="start_time">
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="form.start_time" type="date"
+                                        placeholder="选择日期"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="24">
+                    <el-form-item label="随机资料" prop="machine_doc">
+                        <el-input style="width: 600px" type="textarea"
+                                  autosize v-model="form.machine_doc"/>
+                    </el-form-item>
+                </el-col>
+
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="24">
+                    <el-form-item label="随机附件" prop="accessory_device">
+                        <el-input style="width: 600px" type="textarea"
+                                  autosize v-model="form.accessory_device"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+
+            <el-row :gutter="10">
+                <el-col :span="24">
+                    <el-form-item label="附属设备" prop="machine_att">
+                        <el-input style="width: 600px" type="textarea"
+                                  autosize v-model="form.machine_att"/>
+                    </el-form-item>
+                </el-col>
+
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="24">
+                    <el-form-item label="重大变更记录" prop="repair_record">
+                        <el-input style="width: 600px" type="textarea"
+                                  autosize v-model="form.repair_record"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="10">
+                <el-col :span="12">
+                    <el-form-item label="责任人" prop="responsible_person">
+                        <el-input v-model="form.responsible_person"/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitForm()">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog title="二维码" :visible.sync="dialogVisible">
+        <img width="100px" height="100px"
+             :src="imgSrc"/>
+    </el-dialog>
+    <p class="reminder">{{info}}</p>
+
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="/js/vue.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- 引入组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script src="https://unpkg.com/qrcode.vue@1.6.3/dist/qrcode.vue.js"></script>
+<!-- import JavaScript -->
+<script>
+    var app = new Vue({
+        el: '#app',
+        data() {
+            return {
+                imgSrc:'',
+                info: '',
+                types: [{
+                    value: '冰箱',
+                    label: '冰箱'
+                }, {
+                    value: '空调',
+                    label: '空调'
+                }, {
+                    value: '验钞机',
+                    label: '验钞机'
+                }, {
+                    value: '打印机',
+                    label: '打印机'
+                }, {
+                    value: '电脑',
+                    label: '电脑'
+                }, {
+                    value: '电脑显示器',
+                    label: '电脑显示器'
+                }, {
+                    value: '电脑主机',
+                    label: '电脑主机'
+                }, {
+                    value: '鼠标',
+                    label: '鼠标'
+                }, {
+                    value: '键盘',
+                    label: '键盘'
+                }, {
+                    value: '电磁炉',
+                    label: '电磁炉'
+                }, {
+                    value: '电饭煲',
+                    label: '电饭煲'
+                }, {
+                    value: '电水壶',
+                    label: '电水壶'
+                }
+                ],
+                text: 'https://www.itying.com',
+                dialogVisible: false,
+                pageSize: 10,  // 每页显示条数
+                total: 0,      // 总记录数
+                form: {
+                    no: '',
+                    type: '',
+                    name: '',
+                    store: '',
+                    factory_time: '',
+                    model: '',
+                    price: '',
+                    buy_time: '',
+                    purpose: '',
+                    install_company: '',
+                    warranty: '',
+                    factory: '',
+                    install_location: '',
+                    start_time: '',
+                    machine_doc: '',
+                    accessory_device: '',
+                    machine_att: '',
+                    repair_record: '',
+                    responsible_person: '',
+                    update_time: ''
+                },
+                rules: {
+                    no: [
+                        {required: true, message: '请输入编号', trigger: 'blur'}
+                    ],
+                },
+                formLabelWidth: '120px',
+                dialogFormVisible: false,
+                tableData: []
+            }
+        },
+        computed: {},
+        methods: {
+            openDialog(row) {
+                this.dialogVisible = true
+                this.imgSrc=`/qrcode/${row.no}`
+            },
+            changePage(pageNo) {
+                this.getList(pageNo)
+                console.log(pageNo)
+            },
+            handleClick(row) {
+                this.form = row;
+                this.dialogFormVisible = true
+                console.log(row);
+            },
+            submitForm() {
+                this.$refs.form.validate(valid => {
+                    if (valid) {
+                        // 表单校验通过,执行保存操作
+                        this.saveData();
+                        this.dialogFormVisible = false;
+                    } else {
+                        // 表单校验失败,执行提示操作
+                        this.$message.error('请检查输入项!');
+                    }
+                })
+            },
+            deleteClick(no) {
+                this.deleteData(no);
+                this.getList(1)
+            },
+
+            deleteData(no) {
+                return axios.post(`/remove/${no}`)
+            },
+            qrcode(no) {
+                return axios.get(``)
+            },
+            saveDataApi(form) {
+                return axios.post('/merge', form)
+            },
+            saveData() {
+                this.saveDataApi(this.form).then(res => {
+                    if (res.data.code === 0) {
+                        this.$message.success('保存成功!');
+                        this.resetForm();
+                        this.getList();
+                    } else {
+                        this.$message.error(res.data.msg);
+                    }
+                })
+            },
+            getList(pageNum) {
+                axios.get(`/list?pageNum=${pageNum}&pageSize=${this.pageSize}`).then(res => {
+                    this.tableData = JSON.parse(JSON.stringify(res.data.data))
+                })
+            },
+            getIpAddress() {
+                axios.get(`/ipAddress`).then(res => {
+                    this.info = res.data.data
+                })
+            },
+            resetForm() {
+                this.form.no = ''
+                this.form.type = ''
+                this.form.name = ''
+                this.form.store = ''
+                this.form.factory_time = ''
+                this.form.model = ''
+                this.form.price = ''
+                this.form.buy_time = ''
+                this.form.purpose = ''
+                this.form.install_company = ''
+                this.form.warranty = ''
+                this.form.factory = ''
+                this.form.install_location = ''
+                this.form.start_time = ''
+                this.form.machine_doc = ''
+                this.form.accessory_device = ''
+                this.form.machine_att = ''
+                this.form.repair_record = ''
+                this.form.responsible_person = ''
+            },
+        },
+        mounted() {
+            this.getList(1);  // 默认请求第一页
+            this.getIpAddress();  // 默认请求第一页
+        }
+    })
+
+</script>
+</html>
