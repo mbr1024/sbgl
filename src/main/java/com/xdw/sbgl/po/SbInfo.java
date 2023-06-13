@@ -1,4 +1,4 @@
-package com.xdw.sbgl;
+package com.xdw.sbgl.po;
 
 /**
  * Description:

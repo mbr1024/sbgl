@@ -1,4 +1,4 @@
-package com.xdw.sbgl;
+package com.xdw.sbgl.config;
 
 /**
  * Description:
@@ -7,14 +7,13 @@ package com.xdw.sbgl;
  */
 
 
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 说明：错误异常拦截处理
