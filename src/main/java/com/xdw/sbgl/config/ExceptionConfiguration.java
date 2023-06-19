@@ -7,6 +7,7 @@ package com.xdw.sbgl.config;
  */
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  * from fhadmin.cn
  */
 @Configuration
+@Slf4j
 public class ExceptionConfiguration implements HandlerExceptionResolver {
 
     @Override
@@ -29,7 +31,7 @@ public class ExceptionConfiguration implements HandlerExceptionResolver {
         ModelAndView mv = new ModelAndView(new MappingJackson2JsonView());	//返回json
         mv.addObject("message", ex.getMessage());
         mv.addObject("code", 1);
-        ex.printStackTrace();
+        log.error("统一异常处理捕获到：{}",ex.getMessage());
         return mv;
     }
 

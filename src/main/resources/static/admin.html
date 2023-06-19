@@ -17,8 +17,8 @@
     </style>
 </head>
 <body>
-<div id="app">
-
+<div id="app" v-if="!fullscreenLoading">
+    <div v-loading.fullscreen.lock="fullscreenLoading"></div>
     <h1>设备管理平台</h1>
     <el-button
             style="position: fixed; right: 20px; top: 20px;"
@@ -250,7 +250,8 @@
         el: '#app',
         data() {
             return {
-                imgSrc:'',
+                fullscreenLoading: true,
+                imgSrc: '',
                 info: '',
                 types: [{
                     value: '冰箱',
@@ -330,7 +331,7 @@
         methods: {
             openDialog(row) {
                 this.dialogVisible = true
-                this.imgSrc=`/qrcode/${row.no}`
+                this.imgSrc = `/qrcode/${row.no}`
             },
             changePage(pageNo) {
                 this.getList(pageNo)
@@ -410,6 +411,7 @@
         mounted() {
             this.getList(1);  // 默认请求第一页
             this.getIpAddress();  // 默认请求第一页
+            this.fullscreenLoading = false;
         }
     })
 
