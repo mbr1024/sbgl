@@ -157,7 +157,7 @@ public class SbglController {
         config.setErrorCorrection(ErrorCorrectionLevel.H);
         if (CollectionUtil.isNotEmpty(sbs)) {
             BufferedImage bufferedImage = QrCodeUtil.generate(//
-                    "http://124.222.81.180:8080/detail?no=" + no, config
+                    "https://dzpty.xyz/detail?no=" + no, config
             );
             response.setContentType("image/png");
             ImageIO.write(bufferedImage, "png", response.getOutputStream());
