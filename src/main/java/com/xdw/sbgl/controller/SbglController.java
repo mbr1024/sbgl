@@ -8,9 +8,8 @@ import cn.hutool.db.Entity;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.maxmind.geoip2.DatabaseReader;
-import com.maxmind.geoip2.model.CityResponse;
 import com.xdw.sbgl.po.SbInfo;
+import com.xdw.sbgl.utils.IpLocationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -181,15 +178,9 @@ public class SbglController {
             if (ip.contains(":")) {
                 throw new RuntimeException("ipv6地址");
             }
-            InputStream inputStream = this.getClass().getResourceAsStream("/GeoLite2-City.mmdb");
-            DatabaseReader reader = new DatabaseReader.Builder(inputStream).build();
-            InetAddress ipAddress = InetAddress.getByName(ip);
-            CityResponse response = reader.city(ipAddress);
-            String country = response.getCountry().getName();   // United States
-            String region = response.getLeastSpecificSubdivision().getName(); // California
-            String city = response.getCity().getName();        // Mountain View
-            log.info("有人访问：(#{},#{}-#{}-#{})", ip, country, region, city);
-            mv.addObject("data", country + "-" + region + "-" + city);
+            String realAddressByIP = IpLocationUtil.getRealAddressByIP(ip);
+            log.info("有人访问：(#{},#{})", ip, realAddressByIP);
+            mv.addObject("data", realAddressByIP);
         } catch (Exception e) {
             log.error(e.getMessage());
             mv.addObject("data", "未知");
